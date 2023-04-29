@@ -1,20 +1,20 @@
 function [Wing] = GenerateMesh(Wing)
 
 % Generation of the lattice around the wing. First, the panels are
-% construct thanks to the discretization defined. Second, the control
+% made thanks to the discretization defined. Second, the control
 % points are generated, where the aerodynamic forces take place. Finally,
 % the normal vectors to the lattice surface.
 
 %% DISCRETIZATION
 
 
-x0 = (Geom_dist(0,1,Wing.Parameters.nx,Wing.Parameters.bias_x,true))';
+x0 = (Geom_dist(0,1,Wing.Parameters.nx,true))'; %Linspace entre 0 y 1
 
 y = (Geom_dist(-Wing.Parameters.b/2,Wing.Parameters.b/2,...
-    Wing.Parameters.ny,Wing.Parameters.bias_y,true))';
+    Wing.Parameters.ny,true))'; %Linspace entre -b/2 y b/2
 y(Wing.Parameters.Nss+1) = 0; 
 
-Wing.Mesh.Y = ones(Wing.Parameters.nx,1)*y';
+Wing.Mesh.Y = ones(Wing.Parameters.nx,1)*y'; % Matriz con la discretización en y en cada fila(x)
 Wing.Mesh.X = zeros(Wing.Parameters.nx,Wing.Parameters.ny);
 Wing.Mesh.Z = zeros(Wing.Parameters.nx,Wing.Parameters.ny);
 
@@ -23,15 +23,14 @@ for j = 1:Wing.Parameters.ny
     for i = 1:Wing.Parameters.nx
         yij = Wing.Mesh.Y(i,j);
         x0ij = x0(i);
-        c = real(Wing.Geometry.C(yij));
-        xij = Wing.Geometry.Cr/4+(x0ij-0.25)*c+abs(yij)*...
-            tan(Wing.Parameters.Sweepr);
+        c = real(Wing.Geometry.C(yij)); %cuerda en la sección yij
+        xij =(x0ij-0.25)*c+abs(yij)*tan(Wing.Parameters.Sweepr);
         zij = 0 ; 
         eps_y = Wing.Parameters.tor(yij);
         Ay = [cos(eps_y),sin(eps_y);-sin(eps_y),cos(eps_y)]; ...
-            
+
         Wing.Mesh.X(i,j) = abs(yij)*tan(Wing.Parameters.Sweepr)+[1,0]*(Ay*...
-            [xij-Wing.Geometry.Cr/4 - abs(yij)*...
+            [xij - abs(yij)*...
             tan(Wing.Parameters.Sweepr),zij]')+ Wing.Geometry.Cr/4;
         Wing.Mesh.Z(i,j) = [0,1]*(Ay*[xij-Wing.Geometry.Cr/4 - abs(yij)*...
             tan(Wing.Parameters.Sweepr),zij]')+abs(yij)*...
@@ -48,19 +47,18 @@ for j = 1:Wing.Parameters.ny
         yij = Wing.Mesh.Y(i,j);
         x0ij = x0(i);
         c = real(Wing.Geometry.C(yij));
-        xij = Wing.Geometry.Cr/4+(x0ij-0.25)*c+abs(yij)*...
-            tan(Wing.Parameters.Sweepr);
+        xij =(x0ij-0.25)*c+abs(yij)*tan(Wing.Parameters.Sweepr);
         zij = 0;
         eps_y = Wing.Parameters.tor(yij);
         Ay = [cos(eps_y),sin(eps_y);-sin(eps_y),cos(eps_y)]; ...
             % matriz de giro para torsión
         Xs(i,j) = abs(yij)*tan(Wing.Parameters.Sweepr)+[1,0]*(Ay*[xij - ...
-            Wing.Geometry.Cr/4 - abs(yij)*tan(Wing.Parameters.Sweepr),zij]')...
+            abs(yij)*tan(Wing.Parameters.Sweepr)-0.5*abs(yij)/Wing.Parameters.b+abs(yij)*tan(0.0713075),zij]')...
             + Wing.Geometry.Cr/4;
         Zs(i,j) = [0,1]*(Ay*[xij-Wing.Geometry.Cr/4 - abs(yij)*...
             tan(Wing.Parameters.Sweepr),zij]')+abs(yij)*...
             tan(Wing.Parameters.dihedralr);
-        
+
         Wing.Geometry.torr(j) = eps_y;
         Wing.Geometry.tor(j)  = eps_y*180/pi;
     end
@@ -123,7 +121,7 @@ end
 
 
 
-Xt = zeros(Wing.Parameters.Nc,Wing.Parameters.ny);
+Xt = zeros(Wing.Parameters.Nc,Wing.Parameters.ny); %Mallado de los torbellinos
 Zt = zeros(Wing.Parameters.Nc,Wing.Parameters.ny);
 
 for i = 1:Wing.Parameters.Nc

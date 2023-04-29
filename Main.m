@@ -1,3 +1,9 @@
+%% VORTEX LATTICE METHOD
+
+
+
+
+
 %%
 
 clear all; close all;
@@ -9,7 +15,7 @@ setPlot;
 
 Wing.Parameters.Chord     = 2.5;
 Wing.Parameters.AR        = 7;
-Wing.Parameters.Sweep     = 4.0856;
+Wing.Parameters.Sweep     = 0;
 Wing.Parameters.Sweepr    = deg2rad(Wing.Parameters.Sweep);
 Wing.Parameters.Sw        = 28;
 Wing.Parameters.lambda    = 0.6;
@@ -23,19 +29,19 @@ Wing.Parameters.zoffset   = 0;
 
 Wing.Parameters.prof_R  = '0000';
 Wing.Parameters.prof_T  = '0000';
-Wing.Parameters.PF      = 'trap';
-Wing.Parameters.tor_d   = -0.25;
-Wing.Parameters.theta0  = 1;
+% Wing.Parameters.PF      = 'trap';
+Wing.Parameters.tor_d   = 0;
+Wing.Parameters.theta0  = 0;
 Wing.Parameters.theta0r = deg2rad(Wing.Parameters.theta0);
 Wing.Parameters.tor     = @(y) Wing.Parameters.theta0r*(1-y^2/Wing.Parameters.b^2);
 
-Wing.Parameters.Nc      = 20;
-Wing.Parameters.nx      = Wing.Parameters.Nc+1;
-Wing.Parameters.Nss     = 30;
-Wing.Parameters.ny      = Wing.Parameters.Nss*2+1;
+Wing.Parameters.Nc      = 20;                 %Número de elementos según la cuerda
+Wing.Parameters.nx      = Wing.Parameters.Nc+1;            %Número de nodos según la cuerda
+Wing.Parameters.Nss     = 30;      %Número de elementos según la semienvergadura
+Wing.Parameters.ny      = Wing.Parameters.Nss*2+1; %Número de nodos según la envergadura
 Wing.Parameters.Nt      = Wing.Parameters.Nc*Wing.Parameters.Nss*2;
-Wing.Parameters.bias_x  = 1;
-Wing.Parameters.bias_y  = 1;
+Wing.Parameters.bias_x  = 3;
+Wing.Parameters.bias_y  = 4;
 
 % Flight Conditions
 

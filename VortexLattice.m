@@ -19,6 +19,7 @@ Xs    = Wing.Mesh.Xs;
 Zs    = Wing.Mesh.Zs;
 Nvec  = Wing.Mesh.Nvec;
 
+
 % Definition of AIC
 
 Aij = zeros(Wing.Parameters.Nt,Wing.Parameters.Nt);
@@ -384,15 +385,22 @@ set(leg,'interpreter','latex','location','best')
 grid on
 title('$C_{p}$')
 
-s14   = floor(Wing.Parameters.Nss+Wing.Parameters.Nss/4+1);
-s34   = round(Wing.Parameters.Nss+3*Wing.Parameters.Nc/4+1);
+%Plot de cp en las secciones pedidas
+
+s14   = round(Wing.Parameters.Nss+Wing.Parameters.Nss/4+1);
+s34   = round(Wing.Parameters.Nss+3*Wing.Parameters.Nss/4+1); % Nss por Nc (06/04)
+s12 = round(Wing.Parameters.Nss+Wing.Parameters.Nss/2+1); % Añadido de secciones pedidas
+s95 = round(Wing.Parameters.Nss+Wing.Parameters.Nss*.95+1);
+
 figure()
 plot(Wing.Mesh.Control.X(:,1),Wing.VLM.(name).Cpij(:,1)); hold on
 plot(Wing.Mesh.Control.X(:,s14),Wing.VLM.(name).Cpij(:,s14))
 plot(Wing.Mesh.Control.X(:,s34),Wing.VLM.(name).Cpij(:,s34));
+plot(Wing.Mesh.Control.X(:,s12),Wing.VLM.(name).Cpij(:,s12));
+plot(Wing.Mesh.Control.X(:,s95),Wing.VLM.(name).Cpij(:,s95));
 xlabel('Chordwise (m)')
 ylabel('$c_p$')
-leg=legend('Root','1/4 Semi Span','3/4 Semi Span', 'Trailing Edge');
+leg=legend('Root','1/4 Semi Span','3/4 Semi Span','1/2 Semi Span','.95 Semi Span','Trailing Edge');
 set(leg,'interpreter','latex','location','best')
 grid on
 title('$C_{p}$')
@@ -425,13 +433,16 @@ m0ij = zeros(Wing.Parameters.Nc,2*Wing.Parameters.Nss);
 for j = 1:2*Wing.Parameters.Nss
    for i = 1:Wing.Parameters.Nc
             cij = 0.5*(Xs(i+1,j)-Xs(i,j)+Xs(i+1,j+1)-Xs(i,j+1));
-            Xc4ij = 0.5*(Xn(i,j)+Xn(i,j+1));
-            m0ij(i,j) = -Wing.VLM.(name).clij(i,j)*Xc4ij*cij*bj(j);
+            Xc4ij = 0.5*(Xn(i,j)+Xn(i,j+1)); %Brazo respecto de la línea X=0 08/04
+            Xmij = Xc4ij-Wing.Geometry.Cr/2; %Brazo respecto a la línea media del ala 08/04
+            m0ij(i,j) = -Wing.VLM.(name).clij(i,j)*Xmij*cij*bj(j);
+            m4ij(i,j) = -Wing.VLM.(name).clij(i,j)*Xc4ij*cij*bj(j);
    end
 end
-Wing.VLM.(name).cM0y = 1/(Wing.Parameters.Sw*Wing.Geometry.C(0))*sum(sum(m0ij));
+Wing.VLM.(name).cM0y = 1/(Wing.Parameters.Sw*Wing.Geometry.CMA)*sum(sum(m0ij));
+Wing.VLM.(name).cM4y = 1/(Wing.Parameters.Sw*Wing.Geometry.C(0))*sum(sum(m4ij));
 
-
+Wing.VLM.(name).xCp=-Wing.VLM.(name).cM4y*Wing.Geometry.C(0)/Wing.VLM.(name).cL;
 end
 
 figure()
@@ -443,10 +454,10 @@ title('Torsion along Spanwise')
 
 if FC.naoa > 1
     
-    Cla  = CLplot./FC.aoar;
+    Cla  = CLplot./FC.aoar
     
     figure()
-    plot(FC.aoa,CLplot)
+    plot(FC.aoar,CLplot)
     xlabel('$\alpha$')
     ylabel('$C_L$')
     grid on

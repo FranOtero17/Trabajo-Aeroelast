@@ -38,7 +38,7 @@ Wing.Geometry.(name).zrl = Wing.Parameters.zoffset;
 
 % Tip leading edge
 
-Wing.Geometry.(name).xtl = Wing.Geometry.(name).xrl + tan(Sweep)*b;
+Wing.Geometry.(name).xtl = Wing.Parameters.xoffset+0.5;
 Wing.Geometry.(name).ytl = Wing.Geometry.(name).yrl + b;
 Wing.Geometry.(name).ztl = Wing.Geometry.(name).zrl + tan(dihedral)*b;
 

@@ -1,10 +1,10 @@
 function [Wing]=GenerateWing(Wing)
 
-if strcmp(Wing.Parameters.PF,'trap') == 1
+% if strcmp(Wing.Parameters.PF,'trap') == 1
     C = @(y) Ctrap(y,Wing);
-elseif strcmp(Wing.Parameters.PF,'elps') == 1
-    C = @(y) Celps(y,Wing);
-end
+% elseif strcmp(Wing.Parameters.PF,'elps') == 1
+    % C = @(y) Celps(y,Wing);
+% end
 
 if str2double(Wing.Parameters.prof_R) < 10000
     Wing.Geometry.zc_r = @(x) NACA4(Wing.Parameters.prof_R,x);
